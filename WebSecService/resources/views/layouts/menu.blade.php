@@ -14,7 +14,7 @@
             <a class="nav-link" href="./multable">Multiplication Table</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="./test">Test</a>
+            <a class="nav-link" href="{{route('products_list')}}">Products</a>
         </li>
         </ul>
     </div>
