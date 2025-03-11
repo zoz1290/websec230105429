@@ -9,6 +9,11 @@ Route::post('register', [UsersController::class, 'doRegister'])->name('do_regist
 Route::get('login', [UsersController::class, 'login'])->name('login');
 Route::post('login', [UsersController::class, 'doLogin'])->name('do_login');
 Route::get('logout', [UsersController::class, 'doLogout'])->name('do_logout');
+Route::get('profile/{user?}', [UsersController::class, 'profile'])->name('profile');
+Route::get('users/edit/{user?}', [UsersController::class, 'edit'])->name('users_edit');
+Route::post('users/save/{user}', [UsersController::class, 'save'])->name('users_save');
+
+
 
 Route::get('products', [ProductsController::class, 'list'])->name('products_list');
 Route::get('products/edit/{product?}', [ProductsController::class, 'edit'])->name('products_edit');
