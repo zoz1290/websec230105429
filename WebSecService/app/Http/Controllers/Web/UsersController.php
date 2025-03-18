@@ -17,6 +17,15 @@ class UsersController extends Controller {
 
 	use ValidatesRequests;
 
+    public function list(Request $request) {
+        if(!auth()->user()->hasPermissionTo('show_users'))abort(401);
+        $query = User::select('*');
+        $query->when($request->keywords, 
+        fn($q)=> $q->where("name", "like", "%$request->keywords%"));
+        $users = $query->get();
+        return view('users.list', compact('users'));
+    }
+
 	public function register(Request $request) {
         return view('users.register');
     }
@@ -115,17 +124,64 @@ class UsersController extends Controller {
         if(auth()->id()!=$user->id) {
             if(!auth()->user()->hasPermissionTo('show_users')) abort(401);
         }
-   
+
         $user->name = $request->name;
         $user->save();
 
-        if(auth()->user()->hasPermissionTo('edit_users')) {
+        if(auth()->user()->hasPermissionTo('admin_users')) {
 
             $user->syncRoles($request->roles);
             $user->syncPermissions($request->permissions);
 
             Artisan::call('cache:clear');
         }
+
+        //$user->syncRoles([1]);
+        //Artisan::call('cache:clear');
+
+        return redirect(route('profile', ['user'=>$user->id]));
+    }
+
+    public function delete(Request $request, User $user) {
+
+        if(!auth()->user()->hasPermissionTo('delete_users')) abort(401);
+
+        //$user->delete();
+
+        return redirect()->route('users');
+    }
+
+    public function editPassword(Request $request, User $user = null) {
+
+        $user = $user??auth()->user();
+        if(auth()->id()!=$user?->id) {
+            if(!auth()->user()->hasPermissionTo('edit_users')) abort(401);
+        }
+
+        return view('users.edit_password', compact('user'));
+    }
+
+    public function savePassword(Request $request, User $user) {
+
+        if(auth()->id()==$user?->id) {
+            
+            $this->validate($request, [
+                'password' => ['required', 'confirmed', Password::min(8)->numbers()->letters()->mixedCase()->symbols()],
+            ]);
+
+            if(!Auth::attempt(['email' => $user->email, 'password' => $request->old_password])) {
+                
+                Auth::logout();
+                return redirect('/');
+            }
+        }
+        else if(!auth()->user()->hasPermissionTo('edit_users')) {
+
+            abort(401);
+        }
+
+        $user->password = bcrypt($request->password); //Secure
+        $user->save();
 
         return redirect(route('profile', ['user'=>$user->id]));
     }
