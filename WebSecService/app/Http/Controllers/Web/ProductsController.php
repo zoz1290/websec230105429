@@ -15,6 +15,7 @@ class ProductsController extends Controller {
 	public function __construct()
     {
         $this->middleware('auth:web')->except('list');
+        /*123*/
     }
 
 	public function list(Request $request) {
