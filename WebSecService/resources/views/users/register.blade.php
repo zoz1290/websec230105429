@@ -33,12 +33,7 @@
       </div>
     </form>
 
-    <div class="text-center">
-      <p>- OR -</p>
-      <a href="{{ route('google.login') }}" class="btn btn-danger">
-        <i class="fab fa-google"></i> Register with Google
-      </a>
-    </div>
+    
 
     </div>
   </div>
